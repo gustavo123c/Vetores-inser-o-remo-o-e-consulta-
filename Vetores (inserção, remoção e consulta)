@@ -2,6 +2,7 @@
 
 #define MAX_SIZE 50
 
+// Função para imprimir o vetor
 void imprimirVetor(int vetor[], int tamanho) {
     printf("Vetor: ");
     for (int i = 0; i < tamanho; i++) {
@@ -10,91 +11,117 @@ void imprimirVetor(int vetor[], int tamanho) {
     printf("\n");
 }
 
+// Função para buscar binariamente um elemento no vetor
 int buscaBinaria(int vetor[], int tamanho, int valor) {
-    int esquerda = 0, direita = tamanho - 1;
-    while (esquerda <= direita) {
-        int meio = (esquerda + direita) / 2;
-        if (vetor[meio] == valor) return meio;
-        else if (vetor[meio] < valor) esquerda = meio + 1;
-        else direita = meio - 1;
+    int inicio = 0, fim = tamanho - 1;
+    while (inicio <= fim) {
+        int meio = inicio + (fim - inicio) / 2;
+        if (vetor[meio] == valor)
+            return meio;
+        if (vetor[meio] < valor)
+            inicio = meio + 1;
+        else
+            fim = meio - 1;
     }
-    return -1;
+    return -1; // Elemento não encontrado
 }
 
-void removerElemento(int vetor[], int *tamanho, int valor) {
-    int pos = buscaBinaria(vetor, *tamanho, valor);
-    if (pos == -1) {
+// Função para remover um elemento do vetor
+int removerElemento(int vetor[], int tamanho, int valor) {
+    int posicao = buscaBinaria(vetor, tamanho, valor);
+    if (posicao == -1) {
         printf("Elemento nao encontrado!\n");
-        return;
+        return tamanho;
     }
-    for (int i = pos; i < *tamanho - 1; i++) {
+
+    for (int i = posicao; i < tamanho - 1; i++) {
         vetor[i] = vetor[i + 1];
     }
-    (*tamanho)--;
-    printf("Elemento removido com sucesso!\n");
+    printf("Elemento removido.\n");
+    return tamanho - 1;
 }
 
-void inserirOrdenado(int vetor[], int *tamanho, int valor) {
-    if (*tamanho >= MAX_SIZE) {
-        printf("Vetor cheio! Nao pode inserir mais elementos.\n");
-        return;
+// Função para inserir um elemento de forma ordenada no vetor
+int inserirElemento(int vetor[], int tamanho, int valor) {
+    if (tamanho >= MAX_SIZE) {
+        printf("Capacidade maxima do vetor atingida.\n");
+        return tamanho;
     }
 
-    int i = (*tamanho)++;
-    while (i > 0 && vetor[i - 1] > valor) {
-        vetor[i] = vetor[i - 1];
-        i--;
+    int i;
+    for (i = tamanho - 1; (i >= 0 && vetor[i] > valor); i--) {
+        vetor[i + 1] = vetor[i];
     }
-    vetor[i] = valor;
-    printf("Elemento inserido com sucesso!\n");
+    vetor[i + 1] = valor;
+    printf("Elemento inserido.\n");
+    return tamanho + 1;
 }
 
 int main() {
-    int vetor[MAX_SIZE], tamanho = 0, valor, opcao = 0;
+    int tamanho = 0, opcao;
+    int vetor[MAX_SIZE];
 
-    // Solicita o tamanho do vetor ao usuário
-    printf("Digite o tamanho do vetor (entre 3 e 50): ");
-    scanf("%d", &tamanho);
-    while (tamanho < 3 || tamanho > MAX_SIZE) {
-        printf("Tamanho inválido. Digite novamente (entre 3 e 50): ");
+    // Solicitar tamanho do vetor
+    do {
+        printf("Digite o tamanho do vetor (entre 3 e 50): ");
         scanf("%d", &tamanho);
-    }
+    } while (tamanho < 3 || tamanho > MAX_SIZE);
 
-    // Solicita os elementos do vetor ao usuário e os insere de forma ordenada
+    // Inserir elementos ordenadamente no vetor
+    printf("Insira os elementos do vetor (um por um):\n");
     for (int i = 0; i < tamanho; i++) {
-        printf("Digite o valor inteiro %d: ", i + 1);
+        int valor;
+        printf("Digite o elemento %d: ", i + 1);
         scanf("%d", &valor);
-        inserirOrdenado(vetor, &i, valor);
+        // Inserir elementos de forma ordenada
+        tamanho = inserirElemento(vetor, i, valor);
     }
 
-    // Loop de menu de opções
-    while (opcao != 5) {
-        printf("\nMenu:\n1. Imprimir todo o vetor\n2. Consultar posicao de um elemento\n3. Remover um elemento\n4. Inserir um valor no vetor\n5. Sair\nEscolha uma opcao: ");
+    // Menu de opções
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Imprimir vetor\n");
+        printf("2. Consultar elemento\n");
+        printf("3. Remover elemento\n");
+        printf("4. Inserir elemento\n");
+        printf("5. Sair\n");
+        printf("Escolha uma opcao: ");
         scanf("%d", &opcao);
 
-        if (opcao == 1) {
-            imprimirVetor(vetor, tamanho);
-        } else if (opcao == 2) {
-            printf("Digite o valor a ser consultado: ");
-            scanf("%d", &valor);
-            int pos = buscaBinaria(vetor, tamanho, valor);
-            if (pos == -1) {
-                printf("Elemento nao encontrado!\n");
-            } else {
-                printf("Elemento encontrado na posicao %d\n", pos);
+        switch (opcao) {
+            case 1:
+                imprimirVetor(vetor, tamanho);
+                break;
+            case 2: {
+                int valor;
+                printf("Digite o elemento a ser consultado: ");
+                scanf("%d", &valor);
+                int posicao = buscaBinaria(vetor, tamanho, valor);
+                if (posicao != -1)
+                    printf("Elemento encontrado na posicao %d.\n", posicao);
+                else
+                    printf("Elemento nao encontrado.\n");
+                break;
             }
-        } else if (opcao == 3) {
-            printf("Digite o valor a ser removido: ");
-            scanf("%d", &valor);
-            removerElemento(vetor, &tamanho, valor);
-        } else if (opcao == 4) {
-            printf("Digite o valor a ser inserido: ");
-            scanf("%d", &valor);
-            inserirOrdenado(vetor, &tamanho, valor);
-        } else if (opcao == 5) {
-            printf("Saindo...\n");
-        } else {
-            printf("Opcao invalida!\n");
+            case 3: {
+                int valor;
+                printf("Digite o elemento a ser removido: ");
+                scanf("%d", &valor);
+                tamanho = removerElemento(vetor, tamanho, valor);
+                break;
+            }
+            case 4: {
+                int valor;
+                printf("Digite o elemento a ser inserido: ");
+                scanf("%d", &valor);
+                tamanho = inserirElemento(vetor, tamanho, valor);
+                break;
+            }
+            case 5:
+                printf("Saindo do programa.\n");
+                return 0;
+            default:
+                printf("Opcao invalida! Tente novamente.\n");
         }
     }
 
